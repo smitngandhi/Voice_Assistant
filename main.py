@@ -1,8 +1,12 @@
+from driver.news import getnewstitle
+from driver.news import getnewsdescription
 import pyttsx3 as p
 import speech_recognition as sr
 from  driver import selenium_web
+import time
+from driver import *
 engine = p.init()
-
+r = sr.Recognizer()
 #used to find speed rate of voice the higher the faster
 
 # rate = engine.getProperty('rate')
@@ -16,14 +20,20 @@ engine.setProperty('voice',voices[1].id)
 # print(voices[1].id)
 # print(voices[0].id)
 
-engine.setProperty('rate',170)
+engine.setProperty('rate',150)
 
 def speak(text):
+    # engine.say("Starting")
+    engine.runAndWait()
     engine.say(text)
     engine.runAndWait()
 
 
-speak("Hello Sir I am your personal assistant, My name is Millie..For now I can only play a video on youtube or search an information on wikipedia...What do you want me to do?")
+
+def intro():
+    #   speak("Hey I am Luna,  your personal AI assistant,  created by Smit . I'm here to add a touch of magic to your everyday life and make each moment a bit easier and more enjoyable. Here's how I can assist you: Playing Videos on YouTube: Whether it's your favorite song, a romantic movie, or a cute cat video, just let me know, and I'll play it for you on YouTube. Searching Information on Wikipedia: If you're curious about anything, I can look it up on Wikipedia and provide you with all the information you need. Searching the Web on Google: Whether you're looking for the latest trends, interesting facts, or answers to any questions, I can quickly search Google and bring you the best results. So,  what would you like me to do for you today?")
+        speak("Hey")
+        listen()
 
 def youtube():
         speak("Sir which video do you want to see")
@@ -49,12 +59,39 @@ def wikipedia():
             assist = selenium_web.Info()
             assist.get_info_wikipedia(text)
 
+def chatgpt():
+      speak("Sir could you please give me a specific topic to search about")
+      with sr.Microphone() as source:
+            r.adjust_for_ambient_noise(source,0.5)
+            r.energy_threshold = 1000
+            print("listening")
+            audio = r.listen(source)
+            text = r.recognize_google(audio)
+            speak(f"Searching {text} on Wikipedia")
+            assist = selenium_web.Info()
+            assist.get_chatgpt(text)
 
+def google():
+      speak("Sir could you please give me a specific topic to search about")
+      with sr.Microphone() as source:
+            r.adjust_for_ambient_noise(source,0.5)
+            r.energy_threshold = 1000
+            print("listening")
+            audio = r.listen(source)
+            text = r.recognize_google(audio)
+            speak(f"Searching {text} on Google")
+            assist = selenium_web.Info()
+            assist.get_google(text)
 
+def news():
+      arr_news_title = getnewstitle()
+      arr_news_description = getnewsdescription()
+      speak("Sir here are the top 5  news of the day")
+      for i in range(5):
+            speak(arr_news_title[i])
+            print("Title: " + arr_news_title[i])
+            print("Description: " + arr_news_description[i])
 
-# speak("Hello Sir I am your Personal Assistant, My name is Alex...I can search information on Wikipedia or play a video on youtube...What do you want me to do sir")
-
-r = sr.Recognizer()
 
 
 
@@ -63,16 +100,23 @@ def listen():
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source,1.2)
             r.energy_threshold = 1000
-            print("listening")
+            print("listening...")
             audio = r.listen(source)
             text = r.recognize_google(audio)
             text = str(text)
             text = text.lower()
             print(text)
-            if "video" in text or "youtube" in text :
+            if  "hey" in text and "luna" in text:
+                  intro()
+            elif "video" in text or "youtube" in text :
                  youtube()
-            if "information" in text or "wikipedia" in text:
+            elif "information" in text or "wikipedia" in text:
                  wikipedia()
+            elif "search" in text or "google" in text:
+                  google()
+            elif "news" in text:
+                  news()
+            
 
 
 listen()
