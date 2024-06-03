@@ -4,15 +4,12 @@ import pyttsx3 as p
 import speech_recognition as sr
 from  driver import selenium_web
 import time
+
 from driver import *
 import randfacts
 import datetime
-
-
-#datetime and weather pending
-
-
-
+from  driver.apps import open_app
+from  driver.apps import close_app
 
 engine = p.init()
 r = sr.Recognizer()
@@ -42,11 +39,12 @@ def speak(text):
 engine.say("Starting in 3,  2  ,  1 ")
 speak("Good Morning User, For activating me Say the magical phrase: Hey Luna")
 
+time = datetime.datetime.now().strftime("%H:%M")
 def intro():
         speak("Hello! I'm Luna, your personal AI assistant.")
         assist = selenium_web.Info()
-        temperature = assist.get_temperature(f'Temperature in New york')
-        speak(f'Current Temperature in New york is {temperature}')
+        temperature = assist.get_temperature(f'Temperature in Ahmedabad')
+        speak(f'Current Temperature in Ahmedabad is {temperature} and the time is {time}')
         speak('Furthermore, I can help you find information on Wikipedia, search the web on Google, play videos on YouTube, read out the latest news, provide you temperature of any region across the globe. So what can i do for you today?"')
         listen()
 
@@ -114,6 +112,7 @@ def facts():
 
 def temperature():
       speak("Sir you want to know the temperature of which city")
+
       with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source,0.5)
             r.energy_threshold = 1000
@@ -127,11 +126,34 @@ def temperature():
             speak(f"Temperature of {text} is {temperature}")
 
 
+def launch_app():
+      speak("Sir which app do you wanna open")
+      with sr.Microphone() as source:
+            r.adjust_for_ambient_noise(source,0.5)
+            r.energy_threshold = 1000
+            print("listening..")
+            audio = r.listen(source)
+            text = r.recognize_google(audio)
+            print(f'Opening {text}')
+            open_app(f'{text}')
+            with sr.Microphone() as source:
+                  r.adjust_for_ambient_noise(source,1.2)
+                  r.energy_threshold = 1000
+                  speak("Next")
+                  print("listening...")
+                  audio = r.listen(source)
+                  text = r.recognize_google(audio)
+                  text = text.lower()
+                  close_app(text)
+            listen()
+
+
 
 def listen():
         with sr.Microphone() as source:
             r.adjust_for_ambient_noise(source,1.2)
             r.energy_threshold = 1000
+            speak("Next")
             print("listening...")
             audio = r.listen(source)
             text = r.recognize_google(audio)
@@ -151,10 +173,13 @@ def listen():
                   facts()
             elif "temperature" in text:
                   temperature()
+            elif "go" in text and "to" in text  and "sleep" in text:
+                  speak("Goodbye sir. You can call me anytime")
+                  exit() 
+            elif "open application" in text:
+                  launch_app()
             else:
                   speak("Could you please repeat the magical phrase:  hey luna")
                   listen()
 
 listen()
-
-
