@@ -5,6 +5,15 @@ import speech_recognition as sr
 from  driver import selenium_web
 import time
 from driver import *
+import randfacts
+import datetime
+
+
+#datetime and weather pending
+
+
+
+
 engine = p.init()
 r = sr.Recognizer()
 #used to find speed rate of voice the higher the faster
@@ -20,6 +29,8 @@ engine.setProperty('voice',voices[1].id)
 # print(voices[1].id)
 # print(voices[0].id)
 
+
+
 engine.setProperty('rate',150)
 
 def speak(text):
@@ -28,11 +39,15 @@ def speak(text):
     engine.say(text)
     engine.runAndWait()
 
-
+engine.say("Starting in 3,  2  ,  1 ")
+speak("Good Morning User, For activating me Say the magical phrase: Hey Luna")
 
 def intro():
-    #   speak("Hey I am Luna,  your personal AI assistant,  created by Smit . I'm here to add a touch of magic to your everyday life and make each moment a bit easier and more enjoyable. Here's how I can assist you: Playing Videos on YouTube: Whether it's your favorite song, a romantic movie, or a cute cat video, just let me know, and I'll play it for you on YouTube. Searching Information on Wikipedia: If you're curious about anything, I can look it up on Wikipedia and provide you with all the information you need. Searching the Web on Google: Whether you're looking for the latest trends, interesting facts, or answers to any questions, I can quickly search Google and bring you the best results. So,  what would you like me to do for you today?")
-        speak("Hey")
+        speak("Hello! I'm Luna, your personal AI assistant.")
+        assist = selenium_web.Info()
+        temperature = assist.get_temperature(f'Temperature in New york')
+        speak(f'Current Temperature in New york is {temperature}')
+        speak('Furthermore, I can help you find information on Wikipedia, search the web on Google, play videos on YouTube, read out the latest news, provide you temperature of any region across the globe. So what can i do for you today?"')
         listen()
 
 def youtube():
@@ -92,7 +107,24 @@ def news():
             print("Title: " + arr_news_title[i])
             print("Description: " + arr_news_description[i])
 
+def facts():
+      x = randfacts.getFact()
+      speak("Did you know that " + x)
+      print(x)
 
+def temperature():
+      speak("Sir you want to know the temperature of which city")
+      with sr.Microphone() as source:
+            r.adjust_for_ambient_noise(source,0.5)
+            r.energy_threshold = 1000
+            print("listening..")
+            audio = r.listen(source)
+            text = r.recognize_google(audio)
+            print(f'Getting temperature of {text}')
+            assist = selenium_web.Info()
+            temperature = assist.get_temperature(f'temperature in {text}')
+            print(temperature)
+            speak(f"Temperature of {text} is {temperature}")
 
 
 
@@ -103,10 +135,9 @@ def listen():
             print("listening...")
             audio = r.listen(source)
             text = r.recognize_google(audio)
-            text = str(text)
             text = text.lower()
             print(text)
-            if  "hey" in text and "luna" in text:
+            if  "hey" in text or "luna"  in text or "heyluna" in text:
                   intro()
             elif "video" in text or "youtube" in text :
                  youtube()
@@ -116,8 +147,13 @@ def listen():
                   google()
             elif "news" in text:
                   news()
-            
-
+            elif "fact" in text or "facts" in text or "fax" in text:
+                  facts()
+            elif "temperature" in text:
+                  temperature()
+            else:
+                  speak("Could you please repeat the magical phrase:  hey luna")
+                  listen()
 
 listen()
 
