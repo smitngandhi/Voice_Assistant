@@ -1,6 +1,9 @@
 import requests
-
-url = 'https://newsapi.org/v2/everything?domains=wsj.com&apiKey=25b5a6c1f34e4c23977411808e679c4a'
+from dotenv  import load_dotenv
+import os
+load_dotenv()
+NEWS_API_KEY = os.getenv('NEWS_API')
+url = 'https://newsapi.org/v2/everything?domains=wsj.com&apiKey={NEWS_API_KEY}'
 
 # for wall street:- https://newsapi.org/v2/everything?domains=wsj.com&apiKey=25b5a6c1f34e4c23977411808e679c4a
 # top headlines from techcrunch:- https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=25b5a6c1f34e4c23977411808e679c4a
