@@ -1,0 +1,7 @@
+pyttsx3
+pyautogui
+SpeechRecognition
+requests
+randfacts
+selenium
+pyaudio
